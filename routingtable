@@ -1,0 +1,85 @@
+import sys
+
+class Graph(): 
+
+    def __init__(self, nodes):
+
+        self.distArray = [0 for i in range(nodes)]
+        self.vistSet = [0 for i in range(nodes)]
+        self.V = nodes
+        self.INF = 1000000
+        self.graph = [[0 for column in range(nodes)]  
+                    for row in range(nodes)]
+   
+    def dijkstra(self, srcNode):
+
+        for i in range(self.V):
+            self.distArray[i] = self.INF
+            self.vistSet[i] = False
+        self.distArray[srcNode] = 0
+        for i in range(self.V): 
+            u = self.minDistance(self.distArray, self.vistSet) 
+            self.vistSet[u] = True
+            for v in range(self.V): 
+                if self.graph[u][v] > 0 and self.vistSet[v] == False and self.distArray[v] > self.distArray[u] + self.graph[u][v]: 
+                        self.distArray[v] = self.distArray[u] + self.graph[u][v] 
+        self.printSolution(self.distArray, srcNode)
+
+    def minDistance(self, distArray, vistSet): 
+  
+        min = self.INF
+        for v in range(self.V): 
+            if distArray[v] < min and vistSet[v] == False: 
+                min = distArray[v] 
+                min_index = v 
+  
+        return min_index
+
+    def printSolution(self, dist, src):
+        print("Routing Table for Source Vertex:", src)
+        print("Destination \t Distance \t Next Hop")
+        for node in range(self.V):
+            print(node, "\t\t", dist[node], "\t\t", self.get_next_hop(src, node, dist))
+
+    def get_next_hop(self, src, dest, dist):
+        min_dist = sys.maxsize
+        next_hop = None
+        for neighbor in range(self.V):
+            if neighbor != src and self.graph[src][neighbor] > 0 and self.graph[neighbor][dest] > 0:
+                total_dist = dist[neighbor] + self.graph[neighbor][dest]
+                if total_dist < min_dist:
+                    min_dist = total_dist
+                    next_hop = neighbor
+
+        if next_hop is None:
+            return "None"
+        else:
+            return next_hop
+
+
+#Display our table
+ourGraph = Graph(7) 
+ourGraph.graph = [[0, 2, 6, 0, 0, 0, 0], 
+        [2, 0, 0, 5, 0, 0, 0], 
+        [6, 6, 0, 8, 0, 0, 0], 
+        [0, 0, 8, 0, 10, 15, 0], 
+        [0, 0, 0, 10, 0, 6, 2], 
+        [0, 0, 0, 15, 6, 0, 6], 
+        [0, 0, 0, 0, 2, 6, 0],
+        ]; 
+  
+ourGraph.dijkstra(0)
+
+ourGraph = Graph(9) 
+ourGraph.graph = [[0, 4, 6, 0, 0, 0, 0, 8, 0], 
+        [4, 0, 8, 0, 0, 0, 0, 11, 0], 
+        [0, 8, 0, 7, 0, 4, 0, 0, 2], 
+        [0, 0, 7, 0, 9, 14, 0, 0, 0], 
+        [0, 0, 0, 9, 0, 10, 0, 0, 0], 
+        [0, 0, 4, 14, 10, 0, 2, 0, 0], 
+        [0, 0, 0, 0, 0, 2, 0, 1, 6],
+        [8, 11, 0, 0, 0, 0, 1, 0, 7],
+        [0, 0, 2, 0, 0, 0, 6, 7, 0],
+        ]; 
+  
+ourGraph.dijkstra(8)
